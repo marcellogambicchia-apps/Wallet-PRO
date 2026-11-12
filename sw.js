@@ -1,8 +1,9 @@
-const CACHE_NAME = 'wallet-pro-v4';
+const CACHE_NAME = 'wallet-pro-v5';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './tesseract.min.js',
   './apple-touch-icon.png',
   './icon-192.png',
   './icon-512.png'
