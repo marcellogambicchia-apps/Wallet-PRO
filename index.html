@@ -1067,8 +1067,8 @@
     saveState(); syncYearDropdown(); renderDashboard(); renderStorico(); closeModal();
     showToast('Evento salvato');
   });
-  document.getElementById('btnScanReceipt').addEventListener('click', function() { document.getElementById('receiptFileInput').click(); });
-  document.getElementById('receiptFileInput').addEventListener('change', function(e) {
+    document.getElementById('btnScanReceipt').addEventListener('click', function() { document.getElementById('receiptFileInput').click(); });
+    document.getElementById('receiptFileInput').addEventListener('change', function(e) {
     var file = e.target.files && e.target.files.item(0);
     if (!file) return;
     var status = document.getElementById('ocrStatus');
@@ -1090,7 +1090,7 @@
         var base64Img = canvas.toDataURL('image/jpeg', 0.8);
         var formData = new FormData();
         formData.append('base64Image', base64Img);
-        formData.append('language', 'ita');
+        formData.append('language', 'auto');
         formData.append('isOverlayRequired', 'false');
         formData.append('OCREngine', '2');
 
