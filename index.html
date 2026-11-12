@@ -1087,21 +1087,22 @@
         canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
 
         loadOcrLibrary(function() {
-          status.textContent = 'Lettura testo scontrino in corso...';
-                  Tesseract.recognize(canvas, 'ita', {
+          status.textContent = 'Avvio motore OCR...';
+          Tesseract.recognize(canvas, 'ita', {
             workerPath: './worker.min.js',
             corePath: './tesseract-core.wasm.js',
             workerBlobURL: false,
             logger: function(m) {
-              if (m && m.status === 'recognizing text' && typeof m.progress === 'number') {
-                status.textContent = 'Lettura testo scontrino: ' + Math.round(m.progress * 100) + '%';
+              if (m && m.status) {
+                var pct = typeof m.progress === 'number' ? ' (' + Math.round(m.progress * 100) + '%)' : '';
+                status.textContent = m.status + pct;
               }
             }
           }).then(function(res) {
             var found = extractReceiptData((res && res.data && res.data.text) || '');
             status.textContent = found !== null ? 'Importo rilevato: ' + fmtEur(found) + ' (verifica e salva)' : 'Testo letto, inserisci importo manualmente';
-          }).catch(function() {
-            status.textContent = 'Impossibile leggere lo scontrino, inserisci a mano';
+          }).catch(function(err) {
+            status.textContent = 'Errore OCR: ' + (err && err.message ? err.message : 'inserisci a mano');
           });
         });
       };
