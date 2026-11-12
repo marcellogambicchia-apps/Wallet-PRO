@@ -925,8 +925,7 @@
     }
     return finalVal;
   }
-
-    function loadOcrLibrary(callback) {
+  function loadOcrLibrary(callback) {
     if (typeof Tesseract !== 'undefined') { callback(); return; }
     var s = document.createElement('script');
     s.src = './tesseract.min.js';
@@ -935,22 +934,6 @@
       document.getElementById('ocrStatus').textContent = 'File tesseract.min.js mancante su GitHub';
     };
     document.head.appendChild(s);
-  }
-  
-    function tryNext(idx) {
-      if (idx >= cdns.length) {
-        var status = document.getElementById('ocrStatus');
-        status.textContent = 'Connessione OCR bloccata: apri Wallet-PRO da Safari per scansionare';
-        return;
-      }
-      var s = document.createElement('script');
-      s.src = cdns[idx];
-      s.crossOrigin = 'anonymous';
-      s.onload = callback;
-      s.onerror = function() { tryNext(idx + 1); };
-      document.head.appendChild(s);
-    }
-    tryNext(0);
   }
 
   function downloadFile(filename, content, mime) {
