@@ -928,14 +928,24 @@
 
   function loadOcrLibrary(callback) {
     if (typeof Tesseract !== 'undefined') { callback(); return; }
-    var s = document.createElement('script');
-    s.src = 'https://cloudflare.com';
-    s.onload = callback;
-    s.onerror = function() {
-      var status = document.getElementById('ocrStatus');
-      status.textContent = 'Errore rete: verifica Wi-Fi o 4G/5G';
-    };
-    document.head.appendChild(s);
+    var cdns = [
+      'https://unpkg.com',
+      'https://jsdelivr.net'
+    ];
+    function tryNext(idx) {
+      if (idx >= cdns.length) {
+        var status = document.getElementById('ocrStatus');
+        status.textContent = 'Connessione OCR bloccata: apri Wallet-PRO da Safari per scansionare';
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = cdns[idx];
+      s.crossOrigin = 'anonymous';
+      s.onload = callback;
+      s.onerror = function() { tryNext(idx + 1); };
+      document.head.appendChild(s);
+    }
+    tryNext(0);
   }
 
   function downloadFile(filename, content, mime) {
@@ -1070,25 +1080,37 @@
     showToast('Evento salvato');
   });
   document.getElementById('btnScanReceipt').addEventListener('click', function() { document.getElementById('receiptFileInput').click(); });
-  document.getElementById('receiptFileInput').addEventListener('change', function(e) {
+   document.getElementById('receiptFileInput').addEventListener('change', function(e) {
     var file = e.target.files && e.target.files.item(0);
     if (!file) return;
     var status = document.getElementById('ocrStatus');
     status.style.display = 'block';
-    status.textContent = 'Avvio scanner OCR... attendi 3 secondi';
-    loadOcrLibrary(function() {
-      status.textContent = 'Lettura scontrino in corso...';
-      Tesseract.recognize(file, 'ita', {
-        workerPath: 'https://cloudflare.com',
-        corePath: 'https://cloudflare.com',
-        workerBlobURL: false
-      }).then(function(res) {
-        var found = extractReceiptData((res && res.data && res.data.text) || '');
-        status.textContent = found !== null ? 'Importo rilevato: ' + fmtEur(found) + ' (verifica e salva)' : 'Testo letto, inserisci importo manualmente';
-      }).catch(function() {
-        status.textContent = 'Impossibile leggere la foto, inserisci importo a mano';
-      });
-    });
+    status.textContent = 'Preparazione foto scontrino...';
+
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var img = new Image();
+      img.onload = function() {
+        var maxW = 1200;
+        var scale = img.width > maxW ? (maxW / img.width) : 1;
+        var canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        loadOcrLibrary(function() {
+          status.textContent = 'Lettura testo scontrino in corso...';
+          Tesseract.recognize(canvas, 'ita').then(function(res) {
+            var found = extractReceiptData((res && res.data && res.data.text) || '');
+            status.textContent = found !== null ? 'Importo rilevato: ' + fmtEur(found) + ' (verifica e salva)' : 'Testo letto, inserisci importo manualmente';
+          }).catch(function() {
+            status.textContent = 'Impossibile leggere lo scontrino, inserisci a mano';
+          });
+        });
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
     this.value = '';
   });
 
