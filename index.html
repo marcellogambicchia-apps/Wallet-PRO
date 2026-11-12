@@ -10,7 +10,6 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Wallet-PRO</title>
-<script src="https://jsdelivr.net"></script>
 <style>
   :root {
     --bg: #F2F2F7; --card: #FFFFFF; --text: #1C1C1E; --subtext: #8E8E93;
@@ -1081,9 +1080,40 @@
     saveState(); syncYearDropdown(); renderDashboard(); renderStorico(); closeModal();
     showToast('Evento salvato');
   });
+  function loadOcrLibrary(callback) {
+    if (typeof Tesseract !== 'undefined') { callback(); return; }
+    var s = document.createElement('script');
+    s.src = 'https://jsdelivr.net';
+    s.onload = callback;
+    s.onerror = function() {
+      var status = document.getElementById('ocrStatus');
+      status.textContent = 'OCR non disponibile senza connessione Internet';
+    };
+    document.head.appendChild(s);
+  }
 
   document.getElementById('btnScanReceipt').addEventListener('click', function() {
     document.getElementById('receiptFileInput').click();
+  });
+  document.getElementById('receiptFileInput').addEventListener('change', function(e) {
+    var file = e.target.files && e.target.files.item(0);
+    if (!file) return;
+    var status = document.getElementById('ocrStatus');
+    status.style.display = 'block';
+    status.textContent = 'Avvio scanner OCR... attendi 2-3 secondi';
+
+    loadOcrLibrary(function() {
+      status.textContent = 'Lettura scontrino in corso...';
+      Tesseract.recognize(file, 'ita').then(function(res) {
+        var found = extractReceiptData((res && res.data && res.data.text) || '');
+        status.textContent = found !== null ? 'Importo rilevato: ' + fmtEur(found) + ' (verifica e salva)' : 'Testo letto, inserisci importo manualmente';
+      }).catch(function() {
+        status.textContent = 'Impossibile leggere lo scontrino, inserisci a mano';
+      });
+    });
+    this.value = '';
+  });
+
   });
   document.getElementById('receiptFileInput').addEventListener('change', function(e) {
     var file = e.target.files && e.target.files.item(0);
