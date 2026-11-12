@@ -926,12 +926,17 @@
     return finalVal;
   }
 
-  function loadOcrLibrary(callback) {
+    function loadOcrLibrary(callback) {
     if (typeof Tesseract !== 'undefined') { callback(); return; }
-    var cdns = [
-      'https://unpkg.com',
-      'https://jsdelivr.net'
-    ];
+    var s = document.createElement('script');
+    s.src = './tesseract.min.js';
+    s.onload = callback;
+    s.onerror = function() {
+      document.getElementById('ocrStatus').textContent = 'File tesseract.min.js mancante su GitHub';
+    };
+    document.head.appendChild(s);
+  }
+  
     function tryNext(idx) {
       if (idx >= cdns.length) {
         var status = document.getElementById('ocrStatus');
