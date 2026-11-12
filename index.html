@@ -14,7 +14,7 @@
   :root {
     --bg: #F2F2F7; --card: #FFFFFF; --text: #1C1C1E; --subtext: #8E8E93;
     --border: #E5E5EA; --blue: #007AFF; --green: #34C759; --orange: #FF9500;
-    --indigo: #5856D6; --red: #FF3B30; --teal: #30B0C7; --pill-bg: #E5F1FF;
+    --indigo: #5856D6; --red: #FF3B30; --pill-bg: #E5F1FF;
     --tab-bg: rgba(255, 255, 255, 0.94); --input-bg: #F2F2F7;
   }
   body.dark {
@@ -40,8 +40,7 @@
   .kpi-grid .card { margin-bottom: 0; }
   .accent-top { position: absolute; top: 0; left: 0; right: 0; height: 4px; }
   .accent-green { background-color: var(--green); } .accent-red { background-color: var(--red); }
-  .accent-blue { background-color: var(--blue); } .accent-orange { background-color: var(--orange); }
-  .accent-indigo { background-color: var(--indigo); }
+  .accent-orange { background-color: var(--orange); } .accent-indigo { background-color: var(--indigo); }
   .card-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
   .card-label { font-size: 12px; font-weight: 600; color: var(--subtext); }
   .card-value { font-size: 21px; font-weight: 700; letter-spacing: -0.5px; margin: 2px 0 0 0; }
@@ -412,7 +411,6 @@
     var yrs = getAvailableYears();
     if (yrs.indexOf(currentYear) === -1 && yrs.length > 0) currentYear = yrs.slice(0, 1).pop();
   }
-
   function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
   function savePrefs() { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch (e) {} }
 
@@ -450,6 +448,7 @@
   function escapeHtml(s) {
     return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
+
   function getAvailableYears() {
     var set = {};
     set[new Date().getFullYear()] = true;
@@ -482,7 +481,6 @@
     }
     return m;
   }
-
   function buildLineChartSVG(labels, values, highlightIdx) {
     var n = labels.length;
     var w = Math.max(320, n * 44);
@@ -577,7 +575,6 @@
     legend += '</div>';
     return '<div class="pie-wrapper">' + svg + legend + '</div>';
   }
-
   function renderMonthlyChart(arr) {
     var container = document.getElementById('monthlyChartContainer');
     var type = prefs.monthlyChartType;
@@ -632,6 +629,7 @@
     html += '</div>';
     container.innerHTML = html;
   }
+
   function renderAnnualChart() {
     var container = document.getElementById('annualChartContainer');
     var type = prefs.annualChartType;
@@ -676,7 +674,6 @@
       if (box) box.scrollLeft = Math.max(0, idx * 54 - box.clientWidth / 2 + 27);
     }, 30);
   }
-
   function renderDashboard() {
     var arr = state.monthly[currentYear] || makeZeroYear();
     var yearSum = 0, activeMonths = 0;
@@ -705,8 +702,7 @@
 
     var projEl = document.getElementById('kpiProjSub');
     if (activeMonths > 0 && activeMonths < 12) {
-      var proj = avg * 12;
-      projEl.textContent = 'Stima anno: ' + fmtEur(proj);
+      projEl.textContent = 'Stima anno: ' + fmtEur(avg * 12);
       projEl.style.display = 'block';
     } else {
       projEl.style.display = 'none';
@@ -716,7 +712,6 @@
       return ex.date && Number(ex.date.slice(0, 4)) === currentYear;
     });
     var yearExpSum = yearExpenses.reduce(function(a, b) { return a + (Number(b.amount) || 0); }, 0);
-    var yearSavings = yearSum - yearExpSum;
 
     var allTimeIn = 0;
     Object.keys(state.monthly).forEach(function(y) {
@@ -726,7 +721,7 @@
 
     document.getElementById('kpiNetto').textContent = fmtEur(yearSum);
     document.getElementById('kpiUscite').textContent = fmtEur(yearExpSum);
-    document.getElementById('kpiRisparmioSub').textContent = 'Risparmio: ' + fmtEur(yearSavings);
+    document.getElementById('kpiRisparmioSub').textContent = 'Risparmio: ' + fmtEur(yearSum - yearExpSum);
     document.getElementById('kpiMedia').textContent = fmtEur(avg);
     document.getElementById('kpiTotaleStorico').textContent = fmtEur(allTimeIn);
     document.getElementById('kpiBilancioAll').textContent = 'Bilancio netto: ' + fmtEur(allTimeIn - allTimeOut);
@@ -783,12 +778,7 @@
       container.innerHTML = list.map(function(o) {
         var ex = o.item;
         var icon = CAT_ICONS[ex.category] || '📦';
-        return '<div class="list-row">' +
-               '<div><div>' + icon + ' <b>' + escapeHtml(ex.desc || ex.category) + '</b></div>' +
-               '<div class="row-sub">' + ex.date + ' • ' + escapeHtml(ex.category) + '</div></div>' +
-               '<div style="display:flex;align-items:center;"><span style="font-weight:700;color:var(--red);">-' + fmtEur(ex.amount) + '</span>' +
-               '<button type="button" class="del-btn" data-del-exp="' + o.idx + '">✕</button></div>' +
-               '</div>';
+        return '<div class="list-row"><div><div>' + icon + ' <b>' + escapeHtml(ex.desc || ex.category) + '</b></div><div class="row-sub">' + ex.date + ' • ' + escapeHtml(ex.category) + '</div></div><div style="display:flex;align-items:center;"><span style="font-weight:700;color:var(--red);">-' + fmtEur(ex.amount) + '</span><button type="button" class="del-btn" data-del-exp="' + o.idx + '">✕</button></div></div>';
       }).join('');
     }
 
@@ -798,11 +788,7 @@
     } else {
       recContainer.innerHTML = state.recurring.map(function(r, idx) {
         var icon = CAT_ICONS[r.category] || '📦';
-        return '<div class="list-row">' +
-               '<div><div>' + icon + ' ' + escapeHtml(r.desc || r.category) + '</div>' +
-               '<div class="row-sub">' + escapeHtml(r.category) + ' • ' + fmtEur(r.amount) + '/mese</div></div>' +
-               '<button type="button" class="del-btn" data-del-rec="' + idx + '">Rimuovi</button>' +
-               '</div>';
+        return '<div class="list-row"><div><div>' + icon + ' ' + escapeHtml(r.desc || r.category) + '</div><div class="row-sub">' + escapeHtml(r.category) + ' • ' + fmtEur(r.amount) + '/mese</div></div><button type="button" class="del-btn" data-del-rec="' + idx + '">Rimuovi</button></div>';
       }).join('');
     }
   }
@@ -837,9 +823,7 @@
         var sumIn = (state.monthly[y] || []).reduce(function(a, b) { return a + (Number(b) || 0); }, 0);
         var sumOut = state.expenses.filter(function(ex) { return ex.date && Number(ex.date.slice(0, 4)) === y; })
                                    .reduce(function(a, b) { return a + (Number(b.amount) || 0); }, 0);
-        return '<div class="list-row clickable" data-select-year="' + y + '">' +
-               '<div><b>' + y + '</b><div class="row-sub">Uscite: ' + fmtEur(sumOut) + '</div></div>' +
-               '<span style="font-weight:700;color:var(--blue)">' + fmtEur(sumIn) + '</span></div>';
+        return '<div class="list-row clickable" data-select-year="' + y + '"><div><b>' + y + '</b><div class="row-sub">Uscite: ' + fmtEur(sumOut) + '</div></div><span style="font-weight:700;color:var(--blue)">' + fmtEur(sumIn) + '</span></div>';
       }).join('');
     }
   }
@@ -911,7 +895,6 @@
     document.getElementById('formUscita').style.display = mode === 'uscita' ? 'block' : 'none';
     document.getElementById('formEvento').style.display = mode === 'evento' ? 'block' : 'none';
   }
-
   function extractReceiptData(text) {
     var lines = text.split(/\r?\n/);
     var detectedAmount = null;
@@ -943,6 +926,19 @@
     }
     return finalVal;
   }
+
+  function loadOcrLibrary(callback) {
+    if (typeof Tesseract !== 'undefined') { callback(); return; }
+    var s = document.createElement('script');
+    s.src = 'https://jsdelivr.net';
+    s.onload = callback;
+    s.onerror = function() {
+      var status = document.getElementById('ocrStatus');
+      status.textContent = 'OCR non disponibile senza connessione Internet';
+    };
+    document.head.appendChild(s);
+  }
+
   function downloadFile(filename, content, mime) {
     var blob = new Blob([content], { type: mime });
     var url = URL.createObjectURL(blob);
@@ -954,7 +950,6 @@
     document.body.removeChild(a);
     setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
   }
-
   function importIncomeCsvText(text) {
     var lines = text.split(/\r?\n/);
     var imported = 0;
@@ -1023,15 +1018,11 @@
       showToast('Nessuna uscita valida trovata (usa Data;Categoria;Descrizione;Importo)');
     }
   }
-  document.getElementById('yearSelect').addEventListener('change', function(e) {
-    currentYear = Number(e.target.value);
-    renderDashboard(); renderSpese(); renderStorico();
-  });
+  document.getElementById('yearSelect').addEventListener('change', function(e) { currentYear = Number(e.target.value); renderDashboard(); renderSpese(); renderStorico(); });
   document.getElementById('openModalTopBtn').addEventListener('click', function() { openModal('netto'); });
   document.getElementById('tabAddBtn').addEventListener('click', function() { openModal('uscita'); });
   document.getElementById('closeModalBtn').addEventListener('click', closeModal);
   document.getElementById('addModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
-
   document.getElementById('segNetto').addEventListener('click', function() { setModalSegment('netto'); });
   document.getElementById('segUscita').addEventListener('click', function() { setModalSegment('uscita'); });
   document.getElementById('segEvento').addEventListener('click', function() { setModalSegment('evento'); });
@@ -1061,7 +1052,6 @@
     var isRec = document.getElementById('expRecurring').checked;
     if (!dt) { showToast('Seleziona una data'); return; }
     if (isNaN(val) || val <= 0) { showToast('Inserisci un importo uscita valido'); return; }
-
     state.expenses.push({ date: dt, category: cat, desc: desc, amount: val });
     if (isRec) state.recurring.push({ category: cat, desc: desc, amount: val });
     currentYear = Number(dt.slice(0, 4));
@@ -1080,56 +1070,20 @@
     saveState(); syncYearDropdown(); renderDashboard(); renderStorico(); closeModal();
     showToast('Evento salvato');
   });
-  function loadOcrLibrary(callback) {
-    if (typeof Tesseract !== 'undefined') { callback(); return; }
-    var s = document.createElement('script');
-    s.src = 'https://jsdelivr.net';
-    s.onload = callback;
-    s.onerror = function() {
-      var status = document.getElementById('ocrStatus');
-      status.textContent = 'OCR non disponibile senza connessione Internet';
-    };
-    document.head.appendChild(s);
-  }
 
-  document.getElementById('btnScanReceipt').addEventListener('click', function() {
-    document.getElementById('receiptFileInput').click();
-  });
+  document.getElementById('btnScanReceipt').addEventListener('click', function() { document.getElementById('receiptFileInput').click(); });
   document.getElementById('receiptFileInput').addEventListener('change', function(e) {
     var file = e.target.files && e.target.files.item(0);
     if (!file) return;
     var status = document.getElementById('ocrStatus');
     status.style.display = 'block';
     status.textContent = 'Avvio scanner OCR... attendi 2-3 secondi';
-
     loadOcrLibrary(function() {
       status.textContent = 'Lettura scontrino in corso...';
       Tesseract.recognize(file, 'ita').then(function(res) {
         var found = extractReceiptData((res && res.data && res.data.text) || '');
         status.textContent = found !== null ? 'Importo rilevato: ' + fmtEur(found) + ' (verifica e salva)' : 'Testo letto, inserisci importo manualmente';
-      }).catch(function() {
-        status.textContent = 'Impossibile leggere lo scontrino, inserisci a mano';
-      });
-    });
-    this.value = '';
-  });
-
-  });
-  document.getElementById('receiptFileInput').addEventListener('change', function(e) {
-    var file = e.target.files && e.target.files.item(0);
-    if (!file) return;
-    var status = document.getElementById('ocrStatus');
-    status.style.display = 'block';
-    status.textContent = 'Lettura scontrino in corso... attendi 2-3 secondi';
-    if (typeof Tesseract === 'undefined') {
-      status.textContent = 'Libreria OCR non disponibile offline';
-      return;
-    }
-    Tesseract.recognize(file, 'ita').then(function(res) {
-      var found = extractReceiptData((res && res.data && res.data.text) || '');
-      status.textContent = found !== null ? 'Importo rilevato: ' + fmtEur(found) + ' (verifica e salva)' : 'Testo letto, inserisci importo manualmente';
-    }).catch(function() {
-      status.textContent = 'Impossibile leggere lo scontrino, inserisci a mano';
+      }).catch(function() { status.textContent = 'Impossibile leggere lo scontrino, inserisci a mano'; });
     });
     this.value = '';
   });
@@ -1144,18 +1098,9 @@
     btn.addEventListener('click', function(e) { e.stopPropagation(); prefs.annualChartType = this.getAttribute('data-type'); savePrefs(); renderDashboard(); });
   });
 
-  document.getElementById('monthlyChartTouch').addEventListener('click', function() {
-    prefs.monthlyChartType = CHART_TYPES[(CHART_TYPES.indexOf(prefs.monthlyChartType) + 1) % CHART_TYPES.length];
-    savePrefs(); renderDashboard();
-  });
-  document.getElementById('expenseChartTouch').addEventListener('click', function() {
-    prefs.expenseChartType = prefs.expenseChartType === 'pie' ? 'bar' : 'pie';
-    savePrefs(); renderDashboard();
-  });
-  document.getElementById('annualChartTouch').addEventListener('click', function() {
-    prefs.annualChartType = CHART_TYPES[(CHART_TYPES.indexOf(prefs.annualChartType) + 1) % CHART_TYPES.length];
-    savePrefs(); renderDashboard();
-  });
+  document.getElementById('monthlyChartTouch').addEventListener('click', function() { prefs.monthlyChartType = CHART_TYPES[(CHART_TYPES.indexOf(prefs.monthlyChartType) + 1) % CHART_TYPES.length]; savePrefs(); renderDashboard(); });
+  document.getElementById('expenseChartTouch').addEventListener('click', function() { prefs.expenseChartType = prefs.expenseChartType === 'pie' ? 'bar' : 'pie'; savePrefs(); renderDashboard(); });
+  document.getElementById('annualChartTouch').addEventListener('click', function() { prefs.annualChartType = CHART_TYPES[(CHART_TYPES.indexOf(prefs.annualChartType) + 1) % CHART_TYPES.length]; savePrefs(); renderDashboard(); });
   document.getElementById('expenseMonthFilter').addEventListener('change', renderSpese);
   document.getElementById('speseList').addEventListener('click', function(e) {
     var btn = e.target.closest('[data-del-exp]');
@@ -1168,9 +1113,7 @@
   document.getElementById('btnApplyRecurring').addEventListener('click', function() {
     if (state.recurring.length === 0) { showToast('Nessuna spesa ricorrente da applicare'); return; }
     var today = new Date().toISOString().slice(0, 10);
-    state.recurring.forEach(function(r) {
-      state.expenses.push({ date: today, category: r.category, desc: r.desc, amount: r.amount });
-    });
+    state.recurring.forEach(function(r) { state.expenses.push({ date: today, category: r.category, desc: r.desc, amount: r.amount }); });
     saveState(); renderDashboard(); renderSpese();
     showToast('Applicate ' + state.recurring.length + ' spese fisse al mese');
   });
@@ -1238,7 +1181,7 @@
   });
 
   document.getElementById('btnExportJson').addEventListener('click', function() {
-    downloadFile('Backup_La_Mia_BP_Pro.json', JSON.stringify(state, null, 2), 'application/json');
+    downloadFile('Backup_Wallet_PRO.json', JSON.stringify(state, null, 2), 'application/json');
   });
   document.getElementById('btnImportJson').addEventListener('click', function() { document.getElementById('jsonFileInput').click(); });
   document.getElementById('jsonFileInput').addEventListener('change', function(e) {
@@ -1285,46 +1228,29 @@
 
       if (smsText) {
         var impMatch = smsText.match(/Importo:\s*([0-9.,]+)\s*EUR/i);
-        if (impMatch && impMatch.length > 1) {
-          amount = parseNumberInput(impMatch.pop());
-        }
+        if (impMatch && impMatch.length > 1) amount = parseNumberInput(impMatch.pop());
         var perMatch = smsText.match(/per:\s*(.+?)(?:\.\s*Info:|$)/i);
-        if (perMatch && perMatch.length > 1) {
-          negozio = perMatch.pop().trim();
-        }
+        if (perMatch && perMatch.length > 1) negozio = perMatch.pop().trim();
         var up = negozio.toUpperCase();
-        if (/PICCOLO|SI\.DI|CONAD|LIDL|DECO|SUPERMERCATO|IPERCOOP|AUCHAN|CARREFOUR|PENNY|EUROSPIN|MD |DOK|FAMILA|CRAI|SIGMA|SIMPLY|ALIMENTARI/.test(up)) {
-          categoria = 'Alimentari';
-        } else if (/ENEL|FASTWEB|TIM|VODAFONE|WIND|SKY|GAS|ACQUA|TELEPASS|ENI GAS|PLENITUDE|A2A|ACEA|IREN/.test(up)) {
-          categoria = 'Casa & Utenze';
-        } else if (/AGIP|ENI|Q8|ESSO|TAMOIL|IP |DISTRIBUTORE|AUTOSTRADE|TRENITALIA|ITALO|ANAS|PARCHEGGIO/.test(up)) {
-          categoria = 'Auto & Trasporti';
-        } else if (/FARMACIA|PARAFARMACIA|ANALISI|MEDICO|DENTISTA|OSPEDALE/.test(up)) {
-          categoria = 'Salute';
-        } else if (/RISTORANTE|PIZZERIA|MC DONALD|BAR |CAFFE|CINEMA|PUB|TRATTORIA/.test(up)) {
-          categoria = 'Tempo Libero';
-        }
+        if (/PICCOLO|SI\.DI|CONAD|LIDL|DECO|SUPERMERCATO|IPERCOOP|AUCHAN|CARREFOUR|PENNY|EUROSPIN|MD |DOK|FAMILA|CRAI|SIGMA|SIMPLY|ALIMENTARI/.test(up)) categoria = 'Alimentari';
+        else if (/ENEL|FASTWEB|TIM|VODAFONE|WIND|SKY|GAS|ACQUA|TELEPASS|ENI GAS|PLENITUDE|A2A|ACEA|IREN/.test(up)) categoria = 'Casa & Utenze';
+        else if (/AGIP|ENI|Q8|ESSO|TAMOIL|IP |DISTRIBUTORE|AUTOSTRADE|TRENITALIA|ITALO|ANAS|PARCHEGGIO/.test(up)) categoria = 'Auto & Trasporti';
+        else if (/FARMACIA|PARAFARMACIA|ANALISI|MEDICO|DENTISTA|OSPEDALE/.test(up)) categoria = 'Salute';
+        else if (/RISTORANTE|PIZZERIA|MC DONALD|BAR |CAFFE|CINEMA|PUB|TRATTORIA/.test(up)) categoria = 'Tempo Libero';
       } else if (rawUscita) {
         amount = parseNumberInput(rawUscita);
       }
 
       openModal('uscita');
-      if (!isNaN(amount) && amount > 0) {
-        document.getElementById('expAmount').value = amount.toFixed(2).replace('.', ',');
-      }
+      if (!isNaN(amount) && amount > 0) document.getElementById('expAmount').value = amount.toFixed(2).replace('.', ',');
       document.getElementById('expDesc').value = negozio;
 
       var catSelect = document.getElementById('expCategory');
       for (var i = 0; i < catSelect.options.length; i++) {
-        if (catSelect.options[i].value.toLowerCase() === categoria.toLowerCase()) {
-          catSelect.selectedIndex = i;
-          break;
-        }
+        if (catSelect.options[i].value.toLowerCase() === categoria.toLowerCase()) { catSelect.selectedIndex = i; break; }
       }
 
-      if (window.history && window.history.replaceState) {
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
+      if (window.history && window.history.replaceState) window.history.replaceState({}, document.title, window.location.pathname);
       showToast('Spesa Fineco rilevata: verifica e salva');
     } catch (e) {}
   })();
