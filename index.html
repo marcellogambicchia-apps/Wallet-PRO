@@ -1068,42 +1068,50 @@
     showToast('Evento salvato');
   });
   document.getElementById('btnScanReceipt').addEventListener('click', function() { document.getElementById('receiptFileInput').click(); });
-   document.getElementById('receiptFileInput').addEventListener('change', function(e) {
+  document.getElementById('receiptFileInput').addEventListener('change', function(e) {
     var file = e.target.files && e.target.files.item(0);
     if (!file) return;
     var status = document.getElementById('ocrStatus');
     status.style.display = 'block';
-    status.textContent = 'Preparazione foto scontrino...';
+    status.textContent = 'Ottimizzazione foto scontrino...';
 
     var reader = new FileReader();
     reader.onload = function(ev) {
       var img = new Image();
       img.onload = function() {
-        var maxW = 1200;
+        var maxW = 1000;
         var scale = img.width > maxW ? (maxW / img.width) : 1;
         var canvas = document.createElement('canvas');
         canvas.width = Math.round(img.width * scale);
         canvas.height = Math.round(img.height * scale);
         canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        loadOcrLibrary(function() {
-          status.textContent = 'Avvio motore OCR...';
-          Tesseract.recognize(canvas, 'ita', {
-            workerPath: './worker.min.js',
-            corePath: './tesseract-core.wasm.js',
-            workerBlobURL: false,
-            logger: function(m) {
-              if (m && m.status) {
-                var pct = typeof m.progress === 'number' ? ' (' + Math.round(m.progress * 100) + '%)' : '';
-                status.textContent = m.status + pct;
-              }
-            }
-          }).then(function(res) {
-            var found = extractReceiptData((res && res.data && res.data.text) || '');
+        status.textContent = 'Lettura scontrino in corso...';
+        var base64Img = canvas.toDataURL('image/jpeg', 0.8);
+        var formData = new FormData();
+        formData.append('base64Image', base64Img);
+        formData.append('language', 'ita');
+        formData.append('isOverlayRequired', 'false');
+        formData.append('OCREngine', '2');
+
+        fetch('https://ocr.space', {
+          method: 'POST',
+          headers: { 'apikey': 'helloworld' },
+          body: formData
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var parsedList = data && data.ParsedResults;
+          var txt = (parsedList && parsedList.length > 0 && parsedList.shift().ParsedText) || '';
+          if (txt) {
+            var found = extractReceiptData(txt);
             status.textContent = found !== null ? 'Importo rilevato: ' + fmtEur(found) + ' (verifica e salva)' : 'Testo letto, inserisci importo manualmente';
-          }).catch(function(err) {
-            status.textContent = 'Errore OCR: ' + (err && err.message ? err.message : 'inserisci a mano');
-          });
+          } else {
+            status.textContent = 'Scontrino non leggibile, inserisci importo a mano';
+          }
+        })
+        .catch(function() {
+          status.textContent = 'Errore di connessione durante la lettura';
         });
       };
       img.src = ev.target.result;
