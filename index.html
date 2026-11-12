@@ -1088,7 +1088,16 @@
 
         loadOcrLibrary(function() {
           status.textContent = 'Lettura testo scontrino in corso...';
-          Tesseract.recognize(canvas, 'ita').then(function(res) {
+                  Tesseract.recognize(canvas, 'ita', {
+            workerPath: './worker.min.js',
+            corePath: './tesseract-core.wasm.js',
+            workerBlobURL: false,
+            logger: function(m) {
+              if (m && m.status === 'recognizing text' && typeof m.progress === 'number') {
+                status.textContent = 'Lettura testo scontrino: ' + Math.round(m.progress * 100) + '%';
+              }
+            }
+          }).then(function(res) {
             var found = extractReceiptData((res && res.data && res.data.text) || '');
             status.textContent = found !== null ? 'Importo rilevato: ' + fmtEur(found) + ' (verifica e salva)' : 'Testo letto, inserisci importo manualmente';
           }).catch(function() {
