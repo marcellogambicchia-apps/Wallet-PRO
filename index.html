@@ -927,172 +927,41 @@
     return finalVal;
   }
 
-  function loadOcrLibrary(callback) {
+   function loadOcrLibrary(callback) {
     if (typeof Tesseract !== 'undefined') { callback(); return; }
-    var urls = [
-      'https://jsdelivr.net',
-      'https://unpkg.com'
-    ];
-    function tryLoad(idx) {
-      if (idx >= urls.length) {
-        var status = document.getElementById('ocrStatus');
-        status.textContent = 'Impossibile caricare OCR: controlla la connessione dati';
-        return;
-      }
-      var s = document.createElement('script');
-      s.src = urls[idx];
-      s.onload = callback;
-      s.onerror = function() { tryLoad(idx + 1); };
-      document.head.appendChild(s);
-    }
-    tryLoad(0);
+    var s = document.createElement('script');
+    s.src = 'https://cloudflare.com';
+    s.onload = callback;
+    s.onerror = function() {
+      var status = document.getElementById('ocrStatus');
+      status.textContent = 'Errore rete: verifica Wi-Fi o 4G/5G';
+    };
+    document.head.appendChild(s);
   }
 
-  function downloadFile(filename, content, mime) {
-    var blob = new Blob([content], { type: mime });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
-  }
-  function importIncomeCsvText(text) {
-    var lines = text.split(/\r?\n/);
-    var imported = 0;
-    for (var i = 0; i < lines.length; i++) {
-      var line = lines[i].trim();
-      if (!line) continue;
-      var sep = line.indexOf(';') !== -1 ? ';' : ',';
-      var parts = line.split(sep).map(function(p) { return p.trim().replace(/^"|"$/g, ''); });
-      if (parts.length < 3) continue;
-      var yr = parseInt(parts.shift(), 10);
-      var mRaw = parts.shift().toLowerCase();
-      var val = parseNumberInput(parts.shift());
-      if (isNaN(yr) || yr < 1900 || yr > 2100 || isNaN(val)) continue;
-
-      var mIdx = -1;
-      var mNum = parseInt(mRaw, 10);
-      if (!isNaN(mNum) && mNum >= 1 && mNum <= 12) {
-        mIdx = mNum - 1;
-      } else {
-        for (var m = 0; m < 12; m++) {
-          if (MONTHS[m].toLowerCase().indexOf(mRaw) === 0 || mRaw.indexOf(MONTHS[m].toLowerCase()) === 0) { mIdx = m; break; }
-        }
-      }
-      if (mIdx === -1) continue;
-      if (!state.monthly[yr]) state.monthly[yr] = makeZeroYear();
-      state.monthly[yr][mIdx] = val;
-      currentYear = yr;
-      imported++;
-    }
-    if (imported > 0) {
-      saveState(); syncYearDropdown(); renderDashboard(); renderStorico();
-      showToast('Importate ' + imported + ' entrate mensili');
-    } else {
-      showToast('Nessuna riga valida trovata nel CSV entrate');
-    }
-  }
-
-  function importExpenseCsvText(text) {
-    var lines = text.split(/\r?\n/);
-    var imported = 0;
-    for (var i = 0; i < lines.length; i++) {
-      var line = lines[i].trim();
-      if (!line) continue;
-      var sep = line.indexOf(';') !== -1 ? ';' : ',';
-      var parts = line.split(sep).map(function(p) { return p.trim().replace(/^"|"$/g, ''); });
-      if (parts.length < 4) continue;
-      var dt = parts.shift();
-      var cat = parts.shift() || 'Altro';
-      var desc = parts.shift() || cat;
-      var val = parseNumberInput(parts.shift());
-
-      if (/^\d{2}\/\d{2}\/\d{4}$/.test(dt)) {
-        var dParts = dt.split('/');
-        dt = dParts.pop() + '-' + dParts.pop() + '-' + dParts.pop();
-      }
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(dt) || isNaN(val) || val <= 0) continue;
-
-      state.expenses.push({ date: dt, category: cat, desc: desc, amount: val });
-      currentYear = Number(dt.slice(0, 4));
-      imported++;
-    }
-    if (imported > 0) {
-      saveState(); syncYearDropdown(); renderDashboard(); renderSpese();
-      showToast('Importate ' + imported + ' uscite con successo');
-    } else {
-      showToast('Nessuna uscita valida trovata (usa Data;Categoria;Descrizione;Importo)');
-    }
-  }
-  document.getElementById('yearSelect').addEventListener('change', function(e) { currentYear = Number(e.target.value); renderDashboard(); renderSpese(); renderStorico(); });
-  document.getElementById('openModalTopBtn').addEventListener('click', function() { openModal('netto'); });
-  document.getElementById('tabAddBtn').addEventListener('click', function() { openModal('uscita'); });
-  document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-  document.getElementById('addModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
-  document.getElementById('segNetto').addEventListener('click', function() { setModalSegment('netto'); });
-  document.getElementById('segUscita').addEventListener('click', function() { setModalSegment('uscita'); });
-  document.getElementById('segEvento').addEventListener('click', function() { setModalSegment('evento'); });
-
-  document.querySelectorAll('.tab-item[data-tab]').forEach(function(btn) {
-    btn.addEventListener('click', function() { switchTab(this.getAttribute('data-tab')); });
+  document.getElementById('btnScanReceipt').addEventListener('click', function() {
+    document.getElementById('receiptFileInput').click();
   });
 
-  document.getElementById('btnSaveNetto').addEventListener('click', function() {
-    var yr = parseInt(document.getElementById('inpYear').value, 10);
-    var mo = parseInt(document.getElementById('inpMonth').value, 10);
-    var val = parseNumberInput(document.getElementById('inpAmount').value);
-    if (isNaN(yr) || yr < 1900 || yr > 2100) { showToast('Anno non valido'); return; }
-    if (isNaN(val) || val < 0) { showToast('Importo non valido'); return; }
-    if (!state.monthly[yr]) state.monthly[yr] = makeZeroYear();
-    state.monthly[yr][mo] = val;
-    currentYear = yr;
-    saveState(); syncYearDropdown(); renderDashboard(); renderStorico(); closeModal();
-    showToast('Entrata salvata: ' + MONTHS[mo] + ' ' + yr);
-  });
-
-  document.getElementById('btnSaveUscita').addEventListener('click', function() {
-    var dt = document.getElementById('expDate').value;
-    var cat = document.getElementById('expCategory').value;
-    var desc = document.getElementById('expDesc').value.trim() || cat;
-    var val = parseNumberInput(document.getElementById('expAmount').value);
-    var isRec = document.getElementById('expRecurring').checked;
-    if (!dt) { showToast('Seleziona una data'); return; }
-    if (isNaN(val) || val <= 0) { showToast('Inserisci un importo uscita valido'); return; }
-    state.expenses.push({ date: dt, category: cat, desc: desc, amount: val });
-    if (isRec) state.recurring.push({ category: cat, desc: desc, amount: val });
-    currentYear = Number(dt.slice(0, 4));
-    saveState(); syncYearDropdown(); renderDashboard(); renderSpese(); closeModal();
-    showToast('Uscita salvata: -' + fmtEur(val));
-  });
-
-  document.getElementById('btnSaveEvento').addEventListener('click', function() {
-    var yr = parseInt(document.getElementById('evYear').value, 10);
-    var title = document.getElementById('evTitle').value.trim();
-    var valRaw = document.getElementById('evVal').value.trim();
-    var val = valRaw ? parseNumberInput(valRaw) : null;
-    if (isNaN(yr) || !title) { showToast('Compila anno e descrizione'); return; }
-    state.events.push({ year: yr, title: title, value: val });
-    currentYear = yr;
-    saveState(); syncYearDropdown(); renderDashboard(); renderStorico(); closeModal();
-    showToast('Evento salvato');
-  });
-
-  document.getElementById('btnScanReceipt').addEventListener('click', function() { document.getElementById('receiptFileInput').click(); });
   document.getElementById('receiptFileInput').addEventListener('change', function(e) {
     var file = e.target.files && e.target.files.item(0);
     if (!file) return;
     var status = document.getElementById('ocrStatus');
     status.style.display = 'block';
-    status.textContent = 'Avvio scanner OCR... attendi 2-3 secondi';
+    status.textContent = 'Avvio scanner OCR... attendi 3 secondi';
+
     loadOcrLibrary(function() {
       status.textContent = 'Lettura scontrino in corso...';
-      Tesseract.recognize(file, 'ita').then(function(res) {
+      Tesseract.recognize(file, 'ita', {
+        workerPath: 'https://cloudflare.com',
+        corePath: 'https://cloudflare.com',
+        workerBlobURL: false
+      }).then(function(res) {
         var found = extractReceiptData((res && res.data && res.data.text) || '');
         status.textContent = found !== null ? 'Importo rilevato: ' + fmtEur(found) + ' (verifica e salva)' : 'Testo letto, inserisci importo manualmente';
-      }).catch(function() { status.textContent = 'Impossibile leggere lo scontrino, inserisci a mano'; });
+      }).catch(function() {
+        status.textContent = 'Impossibile leggere la foto, inserisci importo a mano';
+      });
     });
     this.value = '';
   });
