@@ -1094,7 +1094,7 @@
         formData.append('isOverlayRequired', 'false');
         formData.append('OCREngine', '2');
 
-        fetch('https://ocr.space', {
+          fetch('https://api.ocr.space/parse/image', {
           method: 'POST',
           headers: { 'apikey': 'helloworld' },
           body: formData
