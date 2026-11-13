@@ -1410,7 +1410,7 @@
         langPath:new URL('vendor/lang', document.baseURI).href, workerBlobURL:false, gzip:true, logger:function(m) { if(m && m.status) status.textContent = 'OCR locale: ' + m.status + (m.progress ? ' ' + Math.round(m.progress*100) + '%' : ''); }
       }).then(function(result) {
         var txt = result && result.data ? result.data.text : '';
-        parseReceiptOcrText(txt);
+        extractReceiptData(txt);
         status.textContent = 'OCR locale completato. Verifica data e importo prima di salvare.';
       }).catch(function(err) { console.error('OCR locale:',err); status.textContent = 'OCR non riuscito: ' + (err.message || err) + '. Verifica i file vendor e ricarica la pagina.'; }).then(function(){ input.value=''; });
     });
