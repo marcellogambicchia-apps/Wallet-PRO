@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wallet-pro-v13-importa-dedup';
+const CACHE_NAME = 'wallet-pro-v14-importa-dedup';
 const ASSETS = [
   './',
   './index.html',
