@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wallet-pro-v12-ocr-fix';
+const CACHE_NAME = 'wallet-pro-v13-ocr-fix';
 const ASSETS = [
   './',
   './index.html',
