@@ -1,0 +1,17 @@
+WALLET-PRO - Pubblicazione su GitHub Pages
+
+Carica TUTTI i file e la cartella vendor nella ROOT del repository (o nella cartella configurata come sorgente Pages).
+Non caricare la cartella contenitore WalletPRO-completo-PDF-offline: index.html e vendor devono essere affiancati.
+
+index.html
+sw.js
+manifest.json
+vendor/pdf.min.js
+vendor/pdf.worker.min.js
+(altri file vendor inclusi)
+
+Per verificare: apri https://TUO-UTENTE.github.io/TUO-REPO/vendor/pdf.min.js
+Se ottieni 404, controlla percorso, nome, maiuscole/minuscole e configurazione Pages.
+Dopo la pubblicazione, chiudi e riapri la pagina o esegui un aggiornamento forzato.
+
+I PDF sono letti localmente nel browser. Nessuna libreria esterna viene caricata.
