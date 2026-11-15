@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wallet-pro-v20-pdf-deploy-fix';
+const CACHE_NAME = 'wallet-pro-v21-pdf-deploy-fix';
 const ASSETS = [
   './',
   './index.html',
