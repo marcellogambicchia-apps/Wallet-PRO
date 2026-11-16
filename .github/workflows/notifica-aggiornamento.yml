@@ -27,7 +27,7 @@ jobs:
           import json, os, urllib.request, urllib.error, sys
           payload = {
               'app_id': os.environ['ONESIGNAL_APP_ID'],
-              'included_segments': ['Subscribed Users'],
+              "included_segments": ["Total Subscriptions"],
               'headings': {'it': 'Wallet-PRO aggiornato', 'en': 'Wallet-PRO updated'},
               'contents': {'it': 'È disponibile una nuova versione di Wallet-PRO. Apri l’app per aggiornarla.', 'en': 'A new version of Wallet-PRO is available. Open the app to update.'},
               'url': 'https://marcellogambicchia-apps.github.io/Wallet-PRO/'
