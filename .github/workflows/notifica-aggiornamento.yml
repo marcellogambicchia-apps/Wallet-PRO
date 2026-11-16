@@ -1,0 +1,49 @@
+name: Notifica aggiornamento Wallet-PRO
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  notifica:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invia notifica OneSignal
+        env:
+          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+          ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
+        run: |
+          if [ -z "$ONESIGNAL_APP_ID" ] || [ -z "$ONESIGNAL_REST_API_KEY" ]; then
+            echo 'Errore: configura ONESIGNAL_APP_ID e ONESIGNAL_REST_API_KEY nei Secrets di GitHub.' >&2
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json, os, urllib.request, urllib.error
+          payload = {
+              "app_id": os.environ["ONESIGNAL_APP_ID"],
+              "included_segments": ["Subscribed Users"],
+              "headings": {"it": "Wallet-PRO aggiornato", "en": "Wallet-PRO updated"},
+              "contents": {"it": "È disponibile una nuova versione di Wallet-PRO. Apri l'app per aggiornarla.", "en": "A new version of Wallet-PRO is available. Open the app to update."},
+              "url": "https://marcellogambicchia-apps.github.io/Wallet-PRO/"
+          }
+          req = urllib.request.Request(
+              'https://api.onesignal.com/notifications',
+              data=json.dumps(payload).encode('utf-8'),
+              headers={
+                  'Authorization': 'Key ' + os.environ['ONESIGNAL_REST_API_KEY'],
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'
+              }, method='POST')
+          try:
+              with urllib.request.urlopen(req, timeout=30) as resp:
+                  print('Risposta OneSignal:', resp.status, resp.read().decode()[:1500])
+          except urllib.error.HTTPError as exc:
+              print('Errore OneSignal:', exc.code, exc.read().decode()[:1500])
+              raise
+          PY
