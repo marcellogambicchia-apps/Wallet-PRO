@@ -1,0 +1,54 @@
+name: Invia messaggio agli utenti Wallet-PRO
+
+on:
+  workflow_dispatch:
+    inputs:
+      titolo:
+        description: 'Titolo della notifica'
+        required: true
+        type: string
+        default: 'Wallet-PRO'
+      messaggio:
+        description: 'Messaggio per tutti gli iscritti'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  invia:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invia messaggio OneSignal a tutti gli iscritti
+        env:
+          ONESIGNAL_APP_ID: ${{ secrets.ONESIGNAL_APP_ID }}
+          ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
+          TITOLO: ${{ inputs.titolo }}
+          MESSAGGIO: ${{ inputs.messaggio }}
+        run: |
+          python3 - <<'PY'
+          import json, os, sys, urllib.request, urllib.error
+          app_id=os.getenv('ONESIGNAL_APP_ID','').strip()
+          key=os.getenv('ONESIGNAL_REST_API_KEY','').strip()
+          title=os.getenv('TITOLO','').strip()
+          body=os.getenv('MESSAGGIO','').strip()
+          if not app_id or not key:
+              sys.exit('Configura i Secrets ONESIGNAL_APP_ID e ONESIGNAL_REST_API_KEY')
+          if not title or not body or len(title)>100 or len(body)>1000:
+              sys.exit('Titolo richiesto (max 100) e messaggio richiesto (max 1000)')
+          payload={'app_id':app_id,'included_segments':['Total Subscriptions'],
+                   'headings':{'it':title,'en':title},'contents':{'it':body,'en':body},
+                   'url':'https://marcellogambicchia-apps.github.io/Wallet-PRO/'}
+          req=urllib.request.Request('https://api.onesignal.com/notifications',
+              data=json.dumps(payload).encode(),method='POST',headers={
+              'Authorization':'Key '+key,'Content-Type':'application/json','Accept':'application/json'})
+          try:
+              with urllib.request.urlopen(req,timeout=30) as resp:
+                  result=json.loads(resp.read())
+          except urllib.error.HTTPError as e:
+              sys.exit('OneSignal HTTP '+str(e.code)+': '+e.read().decode('utf-8','replace')[:1200])
+          print('OneSignal:',json.dumps(result,ensure_ascii=False))
+          if result.get('errors') or not result.get('id'):
+              sys.exit('Invio non accettato da OneSignal')
+          PY
