@@ -1,0 +1,5 @@
+Wallet-PRO 3.1.0 – aggiornamento interfaccia richiesto.
+Base: versione 3.1.1 con correzione PDF funzionante; tutte le librerie vendor mantenute.
+Modifiche: segmenti Entrata/Uscita/Evento fissi, pulsanti arrotondati, microfono più largo, icona microfono su Importa, Opzioni nella barra, Guida blu sotto Backup dati.
+Versione richiesta 3.1.0: numero inferiore alla precedente 3.1.1, ma build e cache sono univoci.
+Pubblicare tutti i file e cartelle; prima fare backup JSON.

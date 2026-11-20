@@ -1,6 +1,6 @@
-/* Wallet-PRO 3.0.0: precache verificata, navigazione protetta, offline. */
-const CACHE_NAME = 'wallet-pro-v300-20261118';
-const ESSENTIAL = ['./index.html','./vendor/pdf.mjs','./vendor/pdf.worker.mjs',
+/* Wallet-PRO 3.1.0: precache verificata, navigazione protetta, offline. */
+const CACHE_NAME = 'wallet-pro-v310-add-overlay-20261120';
+const ESSENTIAL = ['./index.html','./assets/walletpro.css','./assets/backup-reminder.js','./assets/importi.js','./assets/backup-validazione.js','./assets/onesignal-config.js','./assets/indexeddb-sicuro.js','./assets/indexeddb-opzioni.js','./assets/walletpro-core.js','./assets/dashboard-trascinamento.js','./assets/informazioni.js','./assets/budget-categorie.js','./assets/funzioni-locali.js','./assets/budget-salvataggio.js','./assets/avvisi-dashboard.js','./assets/notifiche-locali.js','./assets/abbonamenti-analisi.js','./assets/banner-aggiornamenti.js','./assets/guida.js','./assets/barra-navigazione.js','./assets/importazione-pdf.js','./assets/pannello-aggiungi.js','./vendor/pdf.mjs','./vendor/pdf.worker.mjs',
  './vendor/xlsx.full.min.js','./vendor/tesseract.min.js','./vendor/worker.min.js',
  './vendor/tesseract-core.wasm.js','./vendor/tesseract-core.wasm',
  './vendor/lang/ita.traineddata.gz','./vendor/lang/eng.traineddata.gz'];

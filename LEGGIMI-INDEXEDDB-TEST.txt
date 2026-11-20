@@ -1,0 +1,5 @@
+Wallet-PRO 3.1.0 — Replica IndexedDB protetta (test)
+localStorage resta archivio principale. latest e previous sono copie locali. Non sostituiscono il backup JSON.
+La sessionStorage dell’anteprima PDF può contenere anche importi estratti; viene cancellata alla fine della procedura.
+Nessun recupero automatico da IndexedDB. Il controllo blocca copie vuote e riduzioni oltre il 40%, ma non rileva ogni possibile corruzione.
+Prima del test esporta un backup JSON e conserva lo ZIP precedente.

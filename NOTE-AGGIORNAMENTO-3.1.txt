@@ -1,0 +1,11 @@
+Wallet-PRO 3.1 - Stabilizzazione e prima pulizia strutturale
+
+Modifiche: namespace SVG, zoom accessibile, build/cache sincronizzati, OneSignal con percorsi relativi, notifiche GitHub Actions SOLO manuali, CSS esterno unico, script JS esterni numerati mantenendo posizione e ordine, promemoria backup ogni 30 giorni.
+
+IMPORTANTE: per il deploy caricare TUTTA la cartella, inclusa assets/. Non cancellare i dati del browser e fare prima backup JSON.
+
+Workflow: su GitHub Actions > Notifica aggiornamento Wallet-PRO > Run workflow, solo dopo aver verificato il rilascio. Eventuale repository variable WALLET_PRO_URL per un dominio personalizzato.
+
+NON ANCORA FATTO: migrazione a IndexedDB (richiede test dati reali), consolidamento dei 19 script in moduli, revisione completa ricorrenze, CSP restrittiva (test OneSignal prima).
+
+I dati finanziari restano nelle chiavi originali. Test automatici: sintassi JS e integrita struttura; test iPhone/OneSignal non eseguiti.

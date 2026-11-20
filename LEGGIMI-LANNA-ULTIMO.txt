@@ -1,0 +1,1 @@
+Wallet-PRO con grafica ispirata a Lanna index last 9.html. Conservati OneSignal, SW, manifest, vendor e chiavi dati. Nuovo pannello Aggiungi e interpretazione locale del testo italiano con memoria categorie dopo salvataggio. Il riconoscimento vocale Web Speech può usare servizi del browser: non è garantito offline. Non pubblicare senza test e backup.

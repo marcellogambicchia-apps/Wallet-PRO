@@ -1,0 +1,9 @@
+Wallet-PRO 3.1.0 — consolidamento CSS prudente
+
+Rimossi commenti e spaziature superflue fra regole CSS.
+Confronto automatico: tutte le regole CSS, i selettori, le dichiarazioni e il loro ordine sono identici alla versione precedente.
+Nessun intervento su JavaScript, PDF, OneSignal o dati finanziari.
+Build/cache tecnica aggiornata senza cambiare versione visibile (3.1.0).
+
+Test: node tests/check-project.cjs
+La verifica visiva su Safari iPhone resta necessaria prima della pubblicazione.

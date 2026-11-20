@@ -1,0 +1,19 @@
+Wallet-PRO 3.1.0 — pulizia tecnica, senza pubblicazione
+
+Questa copia deriva dal pacchetto approvato Wallet-PRO-3.1.0-Interfaccia.zip.
+I file JavaScript sono stati rinominati in base alla funzione e mantenuti
+rigorosamente nello stesso ordine di caricamento. Lo script di 48 byte che
+aggiungeva una classe al body è stato eliminato e sostituito da una classe
+statica sul tag body. Nessuna logica finanziaria è stata riscritta.
+
+Verifiche statiche: eseguire `node tests/check-project.cjs` dalla radice
+del progetto. Questo NON equivale a test funzionali su Safari/iPhone.
+
+Versione utente: 3.1.0 (immutata). Cache tecnica aggiornata per forzare
+il caricamento dei nuovi percorsi degli asset.
+
+Prima di pubblicare: eseguire backup JSON, verificare PDF, Excel, CSV,
+OCR, voce, categorie intelligenti, backup/ripristino e OneSignal su HTTPS.
+
+Prossima fase: consolidamento CSS selettivo e test dei parser; migrazione
+IndexedDB solo dopo un backup verificato e prove di compatibilità.

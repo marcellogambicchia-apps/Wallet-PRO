@@ -1,0 +1,21 @@
+WALLET-PRO 3.1.0 — PUBBLICAZIONE UFFICIALE
+
+Base: versione approvata Barra e Microfono Corretti, con PDF/OCR, IndexedDB in replica e pulsanti archivio.
+
+PRIMA DI PUBBLICARE
+1. Conserva una copia ZIP del repository ufficiale precedente e un backup JSON completo.
+2. Carica il CONTENUTO della cartella Wallet-PRO-main nella RADICE del repository ufficiale Wallet-PRO (non caricare la cartella contenitore).
+3. Sostituisci anche .github/workflows/notifica-aggiornamento.yml: il precedente workflow che partiva a ogni push di index.html deve essere eliminato/sostituito.
+4. Verifica che .github/workflows non contenga altri workflow di aggiornamento automatico.
+5. Verifica in GitHub Settings > Secrets and variables > Actions i Secrets ONESIGNAL_APP_ID, ONESIGNAL_REST_API_KEY e la variabile WALLET_PRO_URL=https://marcellogambicchia-apps.github.io/Wallet-PRO/
+6. Aspetta il completamento della pubblicazione GitHub Pages, poi prova l'app sullo stesso indirizzo ufficiale già utilizzato dagli utenti.
+7. Controlla dashboard, entrate, uscite, backup, importazioni PDF/OCR, IndexedDB e pulsanti di verifica. Su iPhone, se necessario, chiudi e riapri la PWA per aggiornare la cache.
+8. Solo DOPO la verifica, per annunciare l'aggiornamento: Actions > Notifica aggiornamento Wallet-PRO > Run workflow; versione 3.1.0; compila i campi e digita INVIA.
+
+DATI E PRIVACY
+- Non cambiare URL/origine dell'app ufficiale: i dati localStorage/IndexedDB sono legati all'origine del sito.
+- IndexedDB conserva copie locali latest/previous; localStorage resta l'archivio operativo. Non è una migrazione definitiva e non sostituisce il backup JSON.
+- Un aggiornamento dei file dell'app normalmente non cancella i dati locali, ma la conservazione non è garantita da Safari: mantenere backup JSON regolari.
+- Il repository contiene solo codice e risorse dell'app; non caricare backup JSON personali o credenziali OneSignal.
+
+VERSIONE APP: 3.1.0

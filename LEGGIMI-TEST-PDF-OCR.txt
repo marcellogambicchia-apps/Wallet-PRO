@@ -1,0 +1,5 @@
+Wallet-PRO 3.1.0 - test PDF/OCR su iPhone.
+PDF: chiusura documenti PDF.js e pausa tra file, anteprima salvata in sessionStorage durante la lettura (non sono salvati i movimenti).
+OCR: primo passaggio con immagine ottimizzata, secondo sul file originale solo se il primo non individua un importo affidabile.
+GitHub Actions: notifica soltanto manuale con conferma INVIA.
+Prima del test esegui backup JSON. Non pubblicare come release ufficiale.

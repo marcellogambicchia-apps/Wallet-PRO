@@ -1,0 +1,5 @@
+Wallet-PRO 3.1.1 – correzione diagnostica PDF
+I file vendor/pdf.mjs e vendor/pdf.worker.mjs sono inclusi.
+Aprire tramite HTTPS (GitHub Pages), non con doppio clic file://.
+Se il PDF fallisce, ora compare la causa specifica.
+Non modifica i dati finanziari locali.

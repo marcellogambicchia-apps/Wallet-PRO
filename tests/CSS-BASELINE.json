@@ -1,0 +1,6 @@
+{
+  "version": "3.1.0",
+  "rule_count": 342,
+  "css_sha256": "54797466929112e07bcab6573056bff7bedf29cd8f11cb2fea3712b2d7dfa482",
+  "method": "Removed top-level comments/whitespace only; CSS rules, order and declaration bodies unchanged"
+}
